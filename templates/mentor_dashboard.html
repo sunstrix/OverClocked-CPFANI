@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mentors Override</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+:root {
+    /* "Linear App" Aesthetic Palette */
+    --bg: #000000;
+    --card-bg: #09090b; /* Zinc 950 */
+    --card-border: #27272a; /* Zinc 800 */
+    --text-main: #ededed;
+    --text-muted: #a1a1aa;
+    
+    /* Neon Accents */
+    --primary: #6366f1; /* Indigo */
+    --success: #22c55e; /* Green */
+    --danger: #ef4444; /* Red */
+    
+    --radius: 20px;
+    --font-ui: 'Manrope', sans-serif;
+    --font-code: 'Space Mono', monospace;
+}
+
+/* Light Mode Overrides (if toggled) */
+body.light-mode {
+    --bg: #f4f4f5;
+    --card-bg: #ffffff;
+    --card-border: #e4e4e7;
+    --text-main: #18181b;
+    --text-muted: #71717a;
+}
+
+* { box-sizing: border-box; transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1); }
+
+body {
+    margin: 0;
+    padding: 0;
+    background: var(--bg);
+    color: var(--text-main);
+    font-family: var(--font-ui);
+    min-height: 100vh;
+}
+
+.wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 40px 20px;
+}
+
+/* --- HUD Header --- */
+header {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    margin-bottom: 60px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--card-border);
+}
+
+@media(min-width: 768px) {
+    header { flex-direction: row; justify-content: space-between; align-items: flex-end; }
+}
+
+.brand h1 {
+    font-size: 3rem;
+    font-weight: 800;
+    margin: 0;
+    letter-spacing: -0.05em;
+    background: linear-gradient(to right, #fff, #666);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+body.light-mode .brand h1 { background: linear-gradient(to right, #000, #999); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+.controls {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+/* Tech Pills for Filter */
+.pill-group {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    padding: 4px;
+    border-radius: 99px;
+    display: flex;
+}
+
+.filter-btn {
+    background: transparent;
+    border: none;
+    padding: 8px 20px;
+    border-radius: 99px;
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+
+.filter-btn:hover { color: var(--text-main); }
+
+.filter-btn.active {
+    background: var(--text-main);
+    color: var(--bg); /* Inverted text color */
+}
+
+.search-input {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    color: var(--text-main);
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-family: var(--font-ui);
+    width: 200px;
+    outline: none;
+}
+.search-input:focus { border-color: var(--primary); }
+
+.theme-toggle {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+}
+
+/* --- Bento Grid --- */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+    gap: 24px;
+}
+
+/* --- The Card Aesthetic --- */
+.card {
+    background: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: var(--radius);
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    overflow: hidden;
+}
+
+/* THE "OFFLINE" STATE - Push it back */
+.card.unavailable {
+    opacity: 0.4;
+    transform: scale(0.98);
+    filter: grayscale(1);
+    background: var(--bg); /* Blend into background */
+    border-style: dashed;
+}
+/* When hovering an offline card, bring it slightly forward so user can click button */
+.card.unavailable:hover {
+    opacity: 0.8;
+    transform: scale(0.99);
+    filter: grayscale(0.5);
+}
+
+/* Card Header */
+.card-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+}
+
+.mentor-profile {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+}
+
+.avatar {
+    width: 50px;
+    height: 50px;
+    border-radius: 14px;
+    background: #27272a;
+    color: white;
+    font-family: var(--font-code);
+    font-weight: 700;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #3f3f46;
+}
+
+.names h3 { margin: 0; font-size: 1.1rem; font-weight: 700; }
+.names span { font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-code); }
+
+/* Glowing Status Dot */
+.status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 99px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background: rgba(255,255,255,0.05);
+}
+
+.dot { width: 8px; height: 8px; border-radius: 50%; background: #555; box-shadow: 0 0 10px rgba(0,0,0,0); transition: all 0.5s; }
+
+/* Status Logic */
+.card[data-active="true"] .dot { background: var(--success); box-shadow: 0 0 10px var(--success); }
+.card[data-active="true"] .status-indicator { color: var(--success); border: 1px solid rgba(34, 197, 94, 0.2); }
+
+.card[data-active="false"] .dot { background: var(--danger); }
+.card[data-active="false"] .status-indicator { color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+
+/* Load Bar */
+.stats { margin-bottom: 24px; }
+.stat-row { display: flex; justify-content: space-between; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 8px; font-family: var(--font-code); }
+.bar-bg { width: 100%; height: 4px; background: #27272a; border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; background: var(--text-main); border-radius: 4px; }
+
+/* Ticket List */
+.tickets {
+    flex-grow: 1;
+    margin-bottom: 24px;
+    min-height: 80px;
+}
+.tickets ul { list-style: none; padding: 0; margin: 0; }
+.ticket-item {
+    padding: 12px;
+    background: rgba(255,255,255,0.03);
+    border-radius: 8px;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid transparent;
+}
+.ticket-item:hover { border-color: var(--card-border); background: rgba(255,255,255,0.05); }
+
+.t-id { color: var(--primary); font-family: var(--font-code); margin-right: 8px; }
+.btn-done {
+    background: none; border: none; 
+    color: var(--text-muted); font-size: 0.7rem; font-weight: 700; 
+    cursor: pointer; text-transform: uppercase;
+}
+.btn-done:hover { color: var(--success); }
+
+/* --- BIG SOLID TOGGLE BUTTON --- */
+.action-btn {
+    width: 100%;
+    padding: 16px;
+    border-radius: 12px;
+    border: none;
+    font-weight: 700;
+    font-size: 1rem;
+    cursor: pointer;
+    font-family: var(--font-ui);
+    transition: transform 0.1s, background 0.3s;
+}
+
+.action-btn:active { transform: scale(0.97); }
+
+.btn-online {
+    background: var(--success);
+    color: #000; /* High contrast text on neon green */
+}
+.btn-online:hover { background: #4ade80; box-shadow: 0 0 15px rgba(34, 197, 94, 0.4); }
+
+.btn-offline {
+    background: var(--danger);
+    color: #fff;
+}
+.btn-offline:hover { background: #f87171; box-shadow: 0 0 15px rgba(239, 68, 68, 0.4); }
+
+.action-btn.loading { opacity: 0.7; pointer-events: none; }
+
+</style>
+</head>
+<body>
+
+<div class="wrapper">
+    
+    <header>
+        <div class="brand">
+            <h1>MENTOR_OPS</h1>
+            <div style="font-family: var(--font-code); color: var(--text-muted); font-size: 0.8rem; margin-top: 8px;">// SYSTEM STATUS: MONITORING</div>
+        </div>
+
+        <div class="controls">
+            <div class="pill-group">
+                <button class="filter-btn active" onclick="setFilter('all', this)">ALL</button>
+                <button class="filter-btn" onclick="setFilter('available', this)">ACTIVE</button>
+                <button class="filter-btn" onclick="setFilter('unavailable', this)">INACTIVE</button>
+            </div>
+            <input class="search-input" id="search" placeholder="Search ID..." oninput="filterCards()">
+            <button class="theme-toggle" id="themeIcon" onclick="toggleTheme()">☀</button>
+        </div>
+    </header>
+
+    <div class="grid" id="grid">
+    {% for mentor in mentors %}
+    <div class="card {% if not mentor.is_active %}unavailable{% endif %}"
+         id="card-{{ mentor.id }}"
+         data-name="{{ mentor.name.lower() }}"
+         data-active="{{ 'true' if mentor.is_active else 'false' }}">
+        
+        <div class="card-top">
+            <div class="mentor-profile">
+                <div class="avatar">{{ mentor.name[0] }}</div>
+                <div class="names">
+                    <h3>{{ mentor.name }}</h3>
+                    <span>ID: {{ mentor.id }}</span>
+                </div>
+            </div>
+            
+            <div class="status-indicator">
+                <div class="dot"></div>
+                <span id="status-text-{{ mentor.id }}">{{ 'ONLINE' if mentor.is_active else 'OFFLINE' }}</span>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-row">
+                <span>WORKLOAD</span>
+                <span id="load-{{ mentor.id }}">{{ mentor.current_load }} / {{ mentor.max_load }}</span>
+            </div>
+            <div class="bar-bg">
+                <div class="bar-fill" id="bar-{{ mentor.id }}" 
+                     style="width:{{ (mentor.current_load / mentor.max_load * 100) if mentor.max_load else 0 }}%">
+                </div>
+            </div>
+        </div>
+
+        <div class="tickets">
+            <ul id="queries-{{ mentor.id }}" data-mentor="{{ mentor.id }}">
+                <li style="color:var(--text-muted); font-style:italic; font-size:0.8rem;">Syncing...</li>
+            </ul>
+        </div>
+
+        <button class="action-btn {{ 'btn-offline' if mentor.is_active else 'btn-online' }}"
+                id="btn-{{ mentor.id }}"
+                onclick="toggleAvailability({{ mentor.id }})">
+            {{ 'GO OFFLINE' if mentor.is_active else 'GO ONLINE' }}
+        </button>
+
+    </div>
+    {% endfor %}
+    </div>
+
+</div>
+
+<script>
+let currentFilter = 'all';
+
+// --- Logic from previous version, adapted for new classes ---
+
+function toggleTheme(){
+    const b = document.body;
+    b.classList.toggle("light-mode");
+    const isLight = b.classList.contains("light-mode");
+    localStorage.setItem("theme", isLight ? "light" : "dark");
+    document.getElementById("themeIcon").textContent = isLight ? "☾" : "☀";
+}
+if(localStorage.getItem("theme")==="light"){
+    document.body.classList.add("light-mode");
+    document.getElementById("themeIcon").textContent = "☾";
+}
+
+function setFilter(type, el) {
+    currentFilter = type;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+    filterCards();
+}
+
+function filterCards() {
+    const term = document.getElementById("search").value.toLowerCase();
+    document.querySelectorAll(".card").forEach(c => {
+        const nameMatch = c.dataset.name.includes(term);
+        const isActive = c.dataset.active === "true";
+        
+        let statusMatch = true;
+        if(currentFilter === 'available') statusMatch = isActive;
+        if(currentFilter === 'unavailable') statusMatch = !isActive;
+
+        c.style.display = (nameMatch && statusMatch) ? "flex" : "none";
+    });
+}
+
+function updateCardUI(id, isActive) {
+    const card = document.getElementById(`card-${id}`);
+    const btn = document.getElementById(`btn-${id}`);
+    const statusText = document.getElementById(`status-text-${id}`);
+
+    // Update Data
+    card.dataset.active = isActive ? "true" : "false";
+
+    // Visual State (Offline = Recede/Gray)
+    if(isActive) {
+        card.classList.remove("unavailable");
+        statusText.textContent = "ONLINE";
+        
+        btn.classList.remove('btn-online');
+        btn.classList.add('btn-offline');
+        btn.textContent = "GO OFFLINE";
+    } else {
+        card.classList.add("unavailable");
+        statusText.textContent = "OFFLINE";
+        
+        btn.classList.remove('btn-offline');
+        btn.classList.add('btn-online');
+        btn.textContent = "GO ONLINE";
+    }
+    
+    filterCards();
+}
+
+function toggleAvailability(id) {
+    const btn = document.getElementById(`btn-${id}`);
+    if(btn.classList.contains("loading")) return;
+
+    const card = document.getElementById(`card-${id}`);
+    const isCurrentlyActive = card.dataset.active === "true";
+    
+    btn.classList.add("loading");
+    btn.textContent = "PROCESSING...";
+    
+    // Optimistic Update
+    updateCardUI(id, !isCurrentlyActive);
+
+    fetch(`/mentors/${id}/toggle-availability`, { method: "PATCH" })
+        .then(r => { if(!r.ok) throw 0; return r.json(); })
+        .then(() => refreshMentors())
+        .catch(() => {
+            updateCardUI(id, isCurrentlyActive); // Revert
+            alert("System Error: Could not sync status.");
+        })
+        .finally(() => {
+            btn.classList.remove("loading");
+        });
+}
+
+function refreshMentors() {
+    fetch("/mentors/state")
+        .then(r => r.json())
+        .then(list => {
+            list.forEach(m => {
+                updateCardUI(m.id, m.is_active);
+                
+                document.getElementById(`load-${m.id}`).textContent = `${m.current_load} / ${m.max_load}`;
+                document.getElementById(`bar-${m.id}`).style.width = `${(m.current_load / m.max_load * 100)}%`;
+                
+                loadQueries(m.id);
+            });
+        });
+}
+
+function loadQueries(id) {
+    fetch(`/queries/mentor/${id}?include_pending=true`)
+        .then(r => r.json())
+        .then(list => {
+            const ul = document.getElementById(`queries-${id}`);
+            ul.innerHTML = "";
+
+            if (!list.length) {
+                ul.innerHTML = `<li style="color:var(--text-muted); font-size:0.8rem; padding:10px;">No active tickets</li>`;
+                return;
+            }
+
+            list.forEach(q => {
+                const li = document.createElement("li");
+                li.className = "ticket-item";
+                if (q.status === "PENDING") {
+    li.innerHTML = `
+        <div>
+            <span class="t-id">#${q.team_id}</span>
+            ${q.issue}
+        </div>
+        <button class="btn-done" onclick="acceptQuery(${q.id}, ${id})">ACCEPT</button>
+    `;
+} else {
+    li.innerHTML = `
+        <div>
+            <span class="t-id">#${q.team_id}</span>
+            ${q.issue}
+        </div>
+        <button class="btn-done" onclick="resolveQuery(${q.id})">RESOLVE</button>
+    `;
+}
+
+                ul.appendChild(li);
+            });
+        });
+}
+
+function resolveQuery(qid) {
+    fetch(`/queries/${qid}/resolve`, { method: "PATCH" }).then(() => refreshMentors());
+}
+
+setInterval(refreshMentors, 5000);
+document.querySelectorAll("[data-mentor]").forEach(e => loadQueries(e.dataset.mentor));
+function acceptQuery(queryId, mentorId) {
+    fetch(`/queries/${queryId}/accept/${mentorId}`, {
+        method: "PATCH"
+    })
+    .then(r => {
+        if (!r.ok) throw 0;
+        return r.json();
+    })
+    .then(() => refreshMentors())
+    .catch(() => alert("Could not accept query"));
+}
+
+</script>
+
+</body>
+</html>

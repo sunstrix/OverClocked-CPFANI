@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OverClocked | Team Status</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+
+<style>
+:root{
+    --primary:#6366f1;
+    --primary-glow:rgba(99,102,241,.4);
+
+    --bg:#f8fafc;
+    --card:#ffffff;
+    --text:#0f172a;
+    --muted:#64748b;
+    --border:rgba(99,102,241,.2);
+
+    --pending-bg:#fff7ed;
+    --pending-text:#9a3412;
+
+    --assigned-bg:#ecfeff;
+    --assigned-text:#155e75;
+
+    --resolved-bg:#dcfce7;
+    --resolved-text:#166534;
+}
+
+body.dark{
+    --bg:#020617;
+    --card:rgba(15,23,42,.9);
+    --text:#f8fafc;
+    --muted:#94a3b8;
+    --border:rgba(255,255,255,.12);
+}
+
+*{box-sizing:border-box}
+
+body{
+    margin:0;
+    min-height:100vh;
+    font-family:'Plus Jakarta Sans',sans-serif;
+    background:var(--bg);
+    color:var(--text);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+}
+
+/* glow */
+.bg-glow{
+    position:fixed;
+    inset:0;
+    background:
+        radial-gradient(circle at 20% 20%,var(--primary-glow),transparent 40%),
+        radial-gradient(circle at 80% 80%,var(--primary-glow),transparent 40%);
+    filter:blur(120px);
+    z-index:-1;
+}
+
+/* theme toggle */
+.toggle{
+    position:fixed;
+    top:20px;
+    right:20px;
+}
+.toggle button{
+    width:42px;
+    height:42px;
+    border-radius:14px;
+    border:1px solid var(--border);
+    background:var(--card);
+    color:var(--text);
+    cursor:pointer;
+    font-size:1.1rem;
+}
+
+/* card */
+.card{
+    width:100%;
+    max-width:420px;
+    background:var(--card);
+    border:1px solid var(--border);
+    border-radius:28px;
+    padding:32px;
+    backdrop-filter:blur(20px);
+}
+
+.header{
+    text-align:center;
+    margin-bottom:24px;
+}
+.header h1{
+    margin:0;
+    font-size:24px;
+    font-weight:800;
+}
+.header p{
+    margin-top:6px;
+    font-size:12px;
+    font-family:'JetBrains Mono',monospace;
+    letter-spacing:1px;
+    color:var(--muted);
+}
+
+/* status box */
+.status{
+    padding:18px;
+    border-radius:16px;
+    font-size:14px;
+}
+
+.status.pending{
+    background:var(--pending-bg);
+    color:var(--pending-text);
+}
+.status.assigned{
+    background:var(--assigned-bg);
+    color:var(--assigned-text);
+}
+.status.resolved{
+    background:var(--resolved-bg);
+    color:var(--resolved-text);
+}
+
+.row{
+    margin-bottom:10px;
+}
+.label{
+    font-weight:700;
+}
+
+/* footer */
+.footer{
+    margin-top:20px;
+    font-size:11px;
+    text-align:center;
+    color:var(--muted);
+    font-family:'JetBrains Mono',monospace;
+}
+
+/* error */
+.error{
+    background:rgba(239,68,68,.15);
+    color:#ef4444;
+    padding:14px;
+    border-radius:14px;
+    font-size:14px;
+}
+
+/* mobile */
+@media(max-width:420px){
+    .card{padding:24px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg-glow"></div>
+
+<div class="toggle">
+    <button id="themeBtn">🌙</button>
+</div>
+
+<div class="card">
+    <div class="header">
+        <h1>Team Status</h1>
+        <p>OVERCLOCKED HELPDESK</p>
+    </div>
+
+    <div id="statusBox" class="status" style="display:none">
+        <div class="row"><span class="label">Team:</span> <span id="teamText"></span></div>
+        <div class="row"><span class="label">Issue:</span> <span id="issueText"></span></div>
+        <div class="row"><span class="label">Status:</span> <span id="statusText"></span></div>
+        <div class="row"><span class="label">Mentor:</span> <span id="mentorText"></span></div>
+        <div class="row"><span class="label">Updated:</span> <span id="updatedText"></span></div>
+    </div>
+
+    <div id="errorBox" class="error" style="display:none"></div>
+
+    <div class="footer">
+        Auto refreshes every 10 seconds
+    </div>
+</div>
+
+<script>
+/* theme */
+const themeBtn = document.getElementById("themeBtn");
+const saved = localStorage.getItem("theme");
+if(saved==="dark"){
+    document.body.classList.add("dark");
+    themeBtn.textContent="☀️";
+}
+themeBtn.onclick=()=>{
+    const d=document.body.classList.toggle("dark");
+    localStorage.setItem("theme",d?"dark":"light");
+    themeBtn.textContent=d?"☀️":"🌙";
+};
+
+/* team param */
+const params=new URLSearchParams(window.location.search);
+const team=params.get("team");
+
+const statusBox=document.getElementById("statusBox");
+const errorBox=document.getElementById("errorBox");
+
+const teamText=document.getElementById("teamText");
+const issueText=document.getElementById("issueText");
+const statusText=document.getElementById("statusText");
+const mentorText=document.getElementById("mentorText");
+const updatedText=document.getElementById("updatedText");
+
+let poller=null;
+
+if(!team){
+    errorBox.style.display="block";
+    errorBox.textContent="Missing team ID";
+}else{
+    teamText.textContent=team;
+    fetchStatus();
+    poller=setInterval(fetchStatus,10000);
+}
+
+function fetchStatus(){
+    fetch(`/team/${team}/status`)
+        .then(async r=>{
+            if(!r.ok) throw await r.text();
+            return r.json();
+        })
+        .then(data=>{
+            errorBox.style.display="none";
+            statusBox.style.display="block";
+
+            statusBox.className=`status ${data.status}`;
+
+            issueText.textContent=data.issue;
+            statusText.textContent=data.status.toUpperCase();
+            mentorText.textContent=data.mentor || "Not assigned yet";
+            updatedText.textContent=data.updated_at;
+        })
+        .catch(()=>{
+            statusBox.style.display="none";
+            errorBox.style.display="block";
+            errorBox.textContent="No active query found";
+            clearInterval(poller);
+        });
+}
+</script>
+
+</body>
+</html>

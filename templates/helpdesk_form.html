@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>OverClocked Helpdesk</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+<style>
+/* --- VARIABLES --- */
+:root {
+    /* Dark Mode (Default) - Cyberpunk/Neon Palette */
+    --bg-color: #030014;
+    --glass-surface: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-blur: blur(20px);
+    
+    --primary: #8b5cf6; /* Violet */
+    --secondary: #06b6d4; /* Cyan */
+    --glow: rgba(139, 92, 246, 0.4);
+    
+    --text-main: #ffffff;
+    --text-muted: #94a3b8;
+    
+    --input-bg: rgba(0, 0, 0, 0.3);
+    --input-focus-border: #8b5cf6;
+    
+    --radius: 24px;
+    --font-head: 'Rajdhani', sans-serif;
+    --font-body: 'Inter', sans-serif;
+}
+
+body.light-mode {
+    /* Light Mode - Holographic/Clean */
+    --bg-color: #eef2ff;
+    --glass-surface: rgba(255, 255, 255, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.8);
+    
+    --primary: #4f46e5;
+    --secondary: #ec4899;
+    --glow: rgba(79, 70, 229, 0.2);
+    
+    --text-main: #1e293b;
+    --text-muted: #64748b;
+    
+    --input-bg: rgba(255, 255, 255, 0.5);
+    --input-focus-border: #4f46e5;
+}
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--font-body);
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-x: hidden;
+    transition: background 0.3s ease;
+}
+
+/* --- ANIMATED BACKGROUND ORBS --- */
+.orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: -1;
+    animation: moveOrb 15s infinite alternate;
+    opacity: 0.6;
+}
+.orb-1 {
+    width: 60vh; height: 60vh;
+    background: var(--primary);
+    top: -10%; left: -10%;
+}
+.orb-2 {
+    width: 50vh; height: 50vh;
+    background: var(--secondary);
+    bottom: -10%; right: -10%;
+    animation-delay: -5s;
+}
+
+@keyframes moveOrb {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(30px, 50px) scale(1.1); }
+}
+
+/* --- GLASS CARD --- */
+.card {
+    width: 100%;
+    max-width: 420px;
+    background: var(--glass-surface);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    padding: 40px 30px;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    position: relative;
+    overflow: visible; /* Important for dropdown */
+    transform: translateY(0);
+    transition: all 0.3s ease;
+}
+
+/* --- MODERN TOGGLE SWITCH --- */
+.toggle-wrapper {
+    position: absolute;
+    top: 24px; right: 24px;
+    z-index: 10;
+}
+.theme-switch {
+    width: 60px; height: 32px;
+    background: rgba(0,0,0,0.1);
+    border-radius: 100px;
+    border: 1px solid var(--glass-border);
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    transition: 0.3s;
+}
+body.light-mode .theme-switch { background: rgba(255,255,255,0.4); }
+
+.switch-knob {
+    width: 24px; height: 24px;
+    background: var(--text-main);
+    border-radius: 50%;
+    position: absolute;
+    left: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.4s cubic-bezier(0.85, 0, 0.15, 1);
+    color: var(--bg-color); /* Icon color matches bg */
+    font-size: 14px;
+}
+
+/* Toggle Logic in CSS */
+body.light-mode .switch-knob { transform: translateX(28px); }
+
+/* --- HEADER --- */
+.header { text-align: center; margin-bottom: 32px; }
+.header h1 {
+    font-family: var(--font-head);
+    font-size: 2.5rem;
+    margin: 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--text-main), var(--text-muted));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    line-height: 1;
+}
+.header p {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-top: 8px;
+    font-weight: 500;
+}
+
+/* --- INPUTS --- */
+.form-group { margin-bottom: 24px; position: relative; }
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--text-muted);
+    margin-left: 4px;
+}
+
+.input-box {
+    position: relative;
+    transition: transform 0.2s;
+}
+.input-box:focus-within { transform: scale(1.02); }
+
+input, textarea {
+    width: 100%;
+    background: var(--input-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 16px 16px 16px 48px; /* Room for icon */
+    color: var(--text-main);
+    font-family: var(--font-body);
+    font-size: 1rem;
+    outline: none;
+    transition: 0.3s;
+}
+
+textarea { min-height: 120px; resize: none; }
+
+.input-icon {
+    position: absolute;
+    left: 16px; top: 18px;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    transition: 0.3s;
+}
+
+/* Focus States */
+input:focus, textarea:focus {
+    background: rgba(var(--primary), 0.05); /* Slight tint */
+    border-color: var(--primary);
+    box-shadow: 0 0 20px var(--glow);
+}
+input:focus + .input-icon, textarea:focus + .input-icon { color: var(--primary); }
+
+/* --- IMPROVED GLASS DROPDOWN --- */
+.dropdown-menu {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0; right: 0;
+    background: var(--glass-surface); /* Glass effect */
+    backdrop-filter: blur(30px);
+    -webkit-backdrop-filter: blur(30px);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+    padding: 8px;
+    max-height: 240px;
+    overflow-y: auto;
+    z-index: 50;
+    display: none;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+    
+    /* Animation */
+    animation: slideIn 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+}
+
+@keyframes slideIn {
+    from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.dropdown-item {
+    padding: 12px 16px;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: var(--text-main);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.2s;
+    margin-bottom: 2px;
+}
+
+.dropdown-item i { opacity: 0; transform: translateX(-10px); transition: 0.2s; color: var(--secondary); }
+
+.dropdown-item:hover {
+    background: rgba(255,255,255,0.1);
+    padding-left: 20px; /* Slide effect */
+}
+body.light-mode .dropdown-item:hover { background: rgba(0,0,0,0.05); }
+
+.dropdown-item:hover i { opacity: 1; transform: translateX(0); }
+
+/* Scrollbar styling */
+.dropdown-menu::-webkit-scrollbar { width: 6px; }
+.dropdown-menu::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 99px; }
+
+/* --- SUBMIT BUTTON --- */
+.submit-btn {
+    width: 100%;
+    padding: 18px;
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    border: none;
+    border-radius: 16px;
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    font-family: var(--font-body);
+    cursor: pointer;
+    box-shadow: 0 10px 30px var(--glow);
+    transition: 0.3s;
+    position: relative;
+    overflow: hidden;
+}
+
+.submit-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 40px var(--glow);
+}
+.submit-btn:active { transform: scale(0.98); }
+
+.submit-btn:disabled {
+    filter: grayscale(1);
+    opacity: 0.7;
+    cursor: not-allowed;
+}
+
+/* --- MESSAGES --- */
+.msg {
+    margin-top: 20px;
+    padding: 15px;
+    border-radius: 12px;
+    text-align: center;
+    font-weight: 500;
+    font-size: 0.9rem;
+    display: none;
+    animation: fadeIn 0.3s ease;
+}
+.msg.success { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.3); }
+.msg.error { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
+@keyframes fadeIn { from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)} }
+
+/* --- RESPONSIVE ADJUSTMENTS --- */
+@media (max-width: 480px) {
+    .card { padding: 30px 20px; }
+    .header h1 { font-size: 2rem; }
+    /* Make dropdown full width on mobile for better touch */
+    .dropdown-menu { position: fixed; bottom: 0; left: 0; right: 0; top: auto; border-radius: 20px 20px 0 0; max-height: 40vh; border-bottom: none; }
+}
+</style>
+</head>
+
+<body>
+
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
+
+<div class="card">
+    
+    <div class="toggle-wrapper" id="themeBtn">
+        <div class="theme-switch">
+            <div class="switch-knob">
+                <i class="ph-fill ph-moon" id="toggleIcon"></i>
+            </div>
+        </div>
+    </div>
+
+    <div class="header">
+        <h1>OverClocked</h1>
+        <p>HELPDESK PORTAL</p>
+    </div>
+
+    <form id="form">
+        <div class="form-group">
+            <label>Team Identity</label>
+            <div class="input-box">
+                <input id="teamInput" name="team_id" placeholder="Select your team..." autocomplete="off" required>
+                <i class="ph ph-users input-icon"></i>
+            </div>
+            <div id="dropdown" class="dropdown-menu"></div>
+        </div>
+
+        <div class="form-group">
+            <label>Current Location</label>
+            <div class="input-box">
+                <input id="location" name="location" placeholder="e.g. Lab 4, Station 12" required>
+                <i class="ph ph-map-pin input-icon"></i>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Diagnostic Data</label>
+            <div class="input-box">
+                <textarea id="issue" name="issue" placeholder="Describe the malfunction..." required></textarea>
+                <i class="ph ph-warning-octagon input-icon"></i>
+            </div>
+        </div>
+
+        <button class="submit-btn" id="btn">
+            INITIATE REQUEST
+        </button>
+    </form>
+
+    <div id="msg" class="msg"></div>
+</div>
+
+<script>
+/* =================================================================
+   LOGIC SECTION - 100% PRESERVED
+   =================================================================
+*/
+
+const teams = Array.from({length:40},(_,i)=>`Team ${i+1}`);
+const teamInput = document.getElementById("teamInput");
+const dropdown = document.getElementById("dropdown");
+const msg = document.getElementById("msg");
+const btn = document.getElementById("btn");
+
+/* 1. QR Code Prefill Logic */
+const params = new URLSearchParams(window.location.search);
+const qrTeam = params.get("team");
+if (qrTeam && teams.includes(`Team ${qrTeam}`)) {
+    teamInput.value = `Team ${qrTeam}`;
+}
+
+/* 2. Dropdown Logic */
+function renderDropdown(){
+    dropdown.innerHTML="";
+    const v = teamInput.value.toLowerCase();
+    const list = teams.filter(t=>t.toLowerCase().includes(v));
+    
+    // Hide if no matches
+    if(!list.length){
+        dropdown.style.display="none";
+        return;
+    }
+    
+    // Show Dropdown
+    dropdown.style.display="block";
+    list.forEach(t=>{
+        const d=document.createElement("div");
+        d.className="dropdown-item";
+        
+        // Added Icon for UI flair, logic remains same
+        d.innerHTML=`<span>${t}</span><i class="ph-bold ph-caret-right"></i>`;
+        
+        d.onclick=()=>{
+            teamInput.value=t;
+            dropdown.style.display="none";
+        };
+        dropdown.appendChild(d);
+    });
+}
+
+// Triggers
+teamInput.oninput = renderDropdown;
+teamInput.onfocus = renderDropdown;
+
+// Close dropdown if clicked outside
+document.addEventListener('click', (e) => {
+    if (!teamInput.contains(e.target) && !dropdown.contains(e.target)) {
+        dropdown.style.display = 'none';
+    }
+});
+
+/* 3. Submit Logic */
+document.getElementById("form").onsubmit = async e=>{
+    e.preventDefault();
+
+    if(!teams.includes(teamInput.value.trim())){
+        msg.className="msg error";
+        msg.textContent="Please select a valid team from the dropdown";
+        msg.style.display="block";
+        return;
+    }
+
+    // UI Feedback
+    const originalText = btn.innerText;
+    btn.disabled=true;
+    btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> TRANSMITTING...';
+    msg.style.display="none";
+
+    // Data Prep
+    const fd = new FormData(e.target);
+    const teamNumber = Number(teamInput.value.split(" ")[1]);
+    fd.set("team_id", teamNumber);
+
+    try {
+        const res = await fetch("/submit",{ method:"POST", body:fd });
+
+        if(!res.ok) throw new Error("Failed");
+
+        const data = await res.json();
+        // Redirect
+        window.location.href = `/team-status?team=${data.team_id}`;
+    } catch(err) {
+        msg.className="msg error";
+        msg.textContent="Transmission Error. Try again.";
+        msg.style.display="block";
+        btn.disabled=false;
+        btn.innerText = originalText;
+    }
+};
+
+/* 4. Modern Theme Toggle Logic */
+const themeBtn = document.getElementById("themeBtn");
+const toggleIcon = document.getElementById("toggleIcon");
+const body = document.body;
+
+function updateThemeUI(isLight) {
+    // If light mode, show Sun icon. If dark mode, show Moon.
+    toggleIcon.className = isLight ? "ph-fill ph-sun" : "ph-fill ph-moon";
+}
+
+// Check local storage on load
+if(localStorage.getItem("theme") === "light"){
+    body.classList.add("light-mode");
+    updateThemeUI(true);
+}
+
+themeBtn.onclick = () => {
+    body.classList.toggle("light-mode");
+    const isLight = body.classList.contains("light-mode");
+    
+    updateThemeUI(isLight);
+    localStorage.setItem("theme", isLight ? "light" : "dark");
+};
+</script>
+
+</body>
+</html>
