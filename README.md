@@ -87,11 +87,17 @@ OverClocked-Helpdesk/
 
 ## Screenshots
 
-Screenshots of the following pages will be added:
+### Admin Dashboard
+![Admin Dashboard](screenshots/admin_dashboard.png)
 
-* Admin dashboard
-* Mentor dashboard
-* Team helpdesk form
+### QR Generation
+![QR Generation](screenshots/qr_generation.png)
+
+### Mentor Dashboard
+![Mentor Dashboard](screenshots/mentor_dashboard.png)
+
+### Team Helpdesk Form
+![Team Helpdesk Form](screenshots/helpdesk_form.png)
 
 ---
 
