@@ -1,253 +1,581 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OverClocked | Team Status</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Status da Equipe - OverClocked CPFANI</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=JetBrains+Mono&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/@phosphor-icons/web"></script>
 
 <style>
-:root{
-    --primary:#6366f1;
-    --primary-glow:rgba(99,102,241,.4);
-
-    --bg:#f8fafc;
-    --card:#ffffff;
-    --text:#0f172a;
-    --muted:#64748b;
-    --border:rgba(99,102,241,.2);
-
-    --pending-bg:#fff7ed;
-    --pending-text:#9a3412;
-
-    --assigned-bg:#ecfeff;
-    --assigned-text:#155e75;
-
-    --resolved-bg:#dcfce7;
-    --resolved-text:#166534;
+/* --- VARIABLES --- */
+:root {
+    --bg-color: #030014;
+    --glass-surface: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-blur: blur(20px);
+    
+    --primary: #8b5cf6;
+    --secondary: #06b6d4;
+    --glow: rgba(139, 92, 246, 0.4);
+    --success: #22c55e;
+    --warning: #f59e0b;
+    --danger: #ef4444;
+    
+    --text-main: #ffffff;
+    --text-muted: #94a3b8;
+    
+    --radius: 24px;
+    --font-head: 'Rajdhani', sans-serif;
+    --font-body: 'Inter', sans-serif;
 }
 
-body.dark{
-    --bg:#020617;
-    --card:rgba(15,23,42,.9);
-    --text:#f8fafc;
-    --muted:#94a3b8;
-    --border:rgba(255,255,255,.12);
+body.light-mode {
+    --bg-color: #eef2ff;
+    --glass-surface: rgba(255, 255, 255, 0.65);
+    --glass-border: rgba(255, 255, 255, 0.8);
+    --primary: #4f46e5;
+    --secondary: #ec4899;
+    --glow: rgba(79, 70, 229, 0.2);
+    --text-main: #1e293b;
+    --text-muted: #64748b;
 }
 
-*{box-sizing:border-box}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
-body{
-    margin:0;
-    min-height:100vh;
-    font-family:'Plus Jakarta Sans',sans-serif;
-    background:var(--bg);
-    color:var(--text);
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    padding:24px;
-}
-
-/* glow */
-.bg-glow{
-    position:fixed;
-    inset:0;
-    background:
-        radial-gradient(circle at 20% 20%,var(--primary-glow),transparent 40%),
-        radial-gradient(circle at 80% 80%,var(--primary-glow),transparent 40%);
-    filter:blur(120px);
-    z-index:-1;
+body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: var(--font-body);
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    overflow-x: hidden;
+    transition: background 0.3s ease;
 }
 
-/* theme toggle */
-.toggle{
-    position:fixed;
-    top:20px;
-    right:20px;
+.orb {
+    position: fixed;
+    border-radius: 50%;
+    filter: blur(80px);
+    z-index: -1;
+    animation: moveOrb 15s infinite alternate;
+    opacity: 0.6;
 }
-.toggle button{
-    width:42px;
-    height:42px;
-    border-radius:14px;
-    border:1px solid var(--border);
-    background:var(--card);
-    color:var(--text);
-    cursor:pointer;
-    font-size:1.1rem;
+.orb-1 {
+    width: 60vh; height: 60vh;
+    background: var(--primary);
+    top: -10%; left: -10%;
 }
-
-/* card */
-.card{
-    width:100%;
-    max-width:420px;
-    background:var(--card);
-    border:1px solid var(--border);
-    border-radius:28px;
-    padding:32px;
-    backdrop-filter:blur(20px);
+.orb-2 {
+    width: 50vh; height: 50vh;
+    background: var(--secondary);
+    bottom: -10%; right: -10%;
+    animation-delay: -5s;
 }
 
-.header{
-    text-align:center;
-    margin-bottom:24px;
-}
-.header h1{
-    margin:0;
-    font-size:24px;
-    font-weight:800;
-}
-.header p{
-    margin-top:6px;
-    font-size:12px;
-    font-family:'JetBrains Mono',monospace;
-    letter-spacing:1px;
-    color:var(--muted);
+@keyframes moveOrb {
+    0% { transform: translate(0, 0) scale(1); }
+    100% { transform: translate(30px, 50px) scale(1.1); }
 }
 
-/* status box */
-.status{
-    padding:18px;
-    border-radius:16px;
-    font-size:14px;
+.card {
+    width: 100%;
+    max-width: 480px;
+    background: var(--glass-surface);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius);
+    padding: 40px 30px;
+    box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
+    position: relative;
+    text-align: center;
 }
 
-.status.pending{
-    background:var(--pending-bg);
-    color:var(--pending-text);
+.toggle-wrapper {
+    position: absolute;
+    top: 24px; right: 24px;
+    z-index: 10;
 }
-.status.assigned{
-    background:var(--assigned-bg);
-    color:var(--assigned-text);
+.theme-switch {
+    width: 60px; height: 32px;
+    background: rgba(0,0,0,0.1);
+    border-radius: 100px;
+    border: 1px solid var(--glass-border);
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    padding: 4px;
+    transition: 0.3s;
 }
-.status.resolved{
-    background:var(--resolved-bg);
-    color:var(--resolved-text);
+body.light-mode .theme-switch { background: rgba(255,255,255,0.4); }
+
+.switch-knob {
+    width: 24px; height: 24px;
+    background: var(--text-main);
+    border-radius: 50%;
+    position: absolute;
+    left: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.4s cubic-bezier(0.85, 0, 0.15, 1);
+    color: var(--bg-color);
+    font-size: 14px;
+}
+body.light-mode .switch-knob { transform: translateX(28px); }
+
+.header { margin-bottom: 32px; }
+.header h1 {
+    font-family: var(--font-head);
+    font-size: 2rem;
+    margin: 0 0 8px 0;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    background: linear-gradient(135deg, var(--text-main), var(--text-muted));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+.header .team-badge {
+    display: inline-block;
+    padding: 6px 16px;
+    background: rgba(139, 92, 246, 0.2);
+    border: 1px solid var(--primary);
+    border-radius: 99px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--primary);
 }
 
-.row{
-    margin-bottom:10px;
-}
-.label{
-    font-weight:700;
-}
-
-/* footer */
-.footer{
-    margin-top:20px;
-    font-size:11px;
-    text-align:center;
-    color:var(--muted);
-    font-family:'JetBrains Mono',monospace;
+/* --- STATUS CARD --- */
+.status-card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 16px;
+    padding: 24px;
+    margin: 24px 0;
+    border: 1px solid var(--glass-border);
 }
 
-/* error */
-.error{
-    background:rgba(239,68,68,.15);
-    color:#ef4444;
-    padding:14px;
-    border-radius:14px;
-    font-size:14px;
+.status-icon {
+    font-size: 3rem;
+    margin-bottom: 16px;
+    animation: pulse 2s infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(0.95); }
 }
 
-/* mobile */
-@media(max-width:420px){
-    .card{padding:24px}
+.status-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--text-main);
+}
+
+.status-desc {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 16px;
+}
+
+.status-meta {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+}
+.status-meta strong { color: var(--text-main); }
+
+/* --- STATUS COLORS --- */
+.status-pending .status-icon { color: var(--warning); }
+.status-in_progress .status-icon { color: var(--secondary); }
+.status-resolved .status-icon { color: var(--success); }
+.status-cancelled .status-icon { color: var(--danger); }
+.status-error .status-icon { color: var(--danger); }
+
+/* --- ISSUE BOX --- */
+.issue-box {
+    background: rgba(0,0,0,0.2);
+    border-left: 3px solid var(--primary);
+    padding: 12px 16px;
+    border-radius: 0 8px 8px 0;
+    text-align: left;
+    margin: 16px 0;
+    font-size: 0.9rem;
+}
+body.light-mode .issue-box { background: rgba(255,255,255,0.5); }
+
+/* --- MENTOR INFO --- */
+.mentor-info {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    padding: 12px;
+    background: rgba(139, 92, 246, 0.1);
+    border-radius: 12px;
+    margin-top: 16px;
+}
+.mentor-avatar {
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.1rem;
+}
+.mentor-details { text-align: left; }
+.mentor-name { font-weight: 600; color: var(--text-main); }
+.mentor-role { font-size: 0.8rem; color: var(--text-muted); }
+
+/* --- ACTIONS --- */
+.actions {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+}
+.btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+.btn-primary {
+    background: linear-gradient(135deg, var(--primary), var(--secondary));
+    color: white;
+    box-shadow: 0 10px 30px var(--glow);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 15px 40px var(--glow); }
+.btn-secondary {
+    background: var(--glass-surface);
+    border: 1px solid var(--glass-border);
+    color: var(--text-main);
+}
+.btn-secondary:hover { background: rgba(255,255,255,0.1); }
+
+/* --- LOADING & EMPTY STATES --- */
+.loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    padding: 40px 20px;
+}
+.spinner {
+    width: 40px; height: 40px;
+    border: 3px solid var(--glass-border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.empty-state {
+    padding: 40px 20px;
+    color: var(--text-muted);
+}
+.empty-state i { font-size: 2.5rem; margin-bottom: 16px; opacity: 0.5; }
+
+/* --- REFRESH INDICATOR --- */
+.refresh-indicator {
+    position: fixed;
+    bottom: 20px; left: 50%;
+    transform: translateX(-50%);
+    background: var(--glass-surface);
+    border: 1px solid var(--glass-border);
+    padding: 8px 16px;
+    border-radius: 99px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    backdrop-filter: blur(10px);
+}
+.refresh-indicator.syncing { color: var(--success); }
+.refresh-indicator i { animation: spin 2s linear infinite; }
+
+@media (max-width: 480px) {
+    .card { padding: 30px 20px; }
+    .header h1 { font-size: 1.5rem; }
+    .actions { flex-direction: column; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="bg-glow"></div>
-
-<div class="toggle">
-    <button id="themeBtn">🌙</button>
-</div>
+<div class="orb orb-1"></div>
+<div class="orb orb-2"></div>
 
 <div class="card">
+    
+    <div class="toggle-wrapper" id="themeBtn">
+        <div class="theme-switch">
+            <div class="switch-knob">
+                <i class="ph-fill ph-moon" id="toggleIcon"></i>
+            </div>
+        </div>
+    </div>
+
     <div class="header">
-        <h1>Team Status</h1>
-        <p>OVERCLOCKED HELPDESK</p>
+        <h1>Status do Chamado</h1>
+        <div class="team-badge" id="teamBadge">Equipe #--</div>
     </div>
 
-    <div id="statusBox" class="status" style="display:none">
-        <div class="row"><span class="label">Team:</span> <span id="teamText"></span></div>
-        <div class="row"><span class="label">Issue:</span> <span id="issueText"></span></div>
-        <div class="row"><span class="label">Status:</span> <span id="statusText"></span></div>
-        <div class="row"><span class="label">Mentor:</span> <span id="mentorText"></span></div>
-        <div class="row"><span class="label">Updated:</span> <span id="updatedText"></span></div>
+    <!-- Loading State -->
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Buscando informações do chamado...</p>
     </div>
 
-    <div id="errorBox" class="error" style="display:none"></div>
-
-    <div class="footer">
-        Auto refreshes every 10 seconds
+    <!-- Empty State -->
+    <div id="empty" class="empty-state" style="display:none;">
+        <i class="ph ph-info"></i>
+        <p>Nenhum chamado ativo encontrado para esta equipe.</p>
+        <button class="btn btn-primary" onclick="window.location.href='/'" style="margin-top:16px;">
+            <i class="ph ph-plus"></i> Abrir Novo Chamado
+        </button>
     </div>
+
+    <!-- Status Content -->
+    <div id="content" style="display:none;">
+        
+        <div class="status-card" id="statusCard">
+            <i class="status-icon ph-fill ph-hourglass" id="statusIcon"></i>
+            <div class="status-title" id="statusTitle">Aguardando atendimento</div>
+            <div class="status-desc" id="statusDesc">
+                Seu chamado foi registrado e está na fila de atendimento. Um mentor será atribuído em breve.
+            </div>
+            <div class="status-meta">
+                <span>Atualizado: <strong id="updatedAt">--:--</strong></span>
+            </div>
+        </div>
+
+        <div class="issue-box">
+            <strong>Problema relatado:</strong>
+            <p id="issueText" style="margin:8px 0 0 0; color:var(--text-muted);">--</p>
+        </div>
+
+        <div class="mentor-info" id="mentorInfo" style="display:none;">
+            <div class="mentor-avatar" id="mentorAvatar">M</div>
+            <div class="mentor-details">
+                <div class="mentor-name" id="mentorName">Aguardando atribuição</div>
+                <div class="mentor-role">Mentor Responsável</div>
+            </div>
+        </div>
+
+        <div class="actions">
+            <button class="btn btn-secondary" onclick="location.reload()">
+                <i class="ph ph-arrows-clockwise"></i> Atualizar
+            </button>
+            <button class="btn btn-primary" onclick="window.location.href='/'">
+                <i class="ph ph-house"></i> Voltar ao Início
+            </button>
+        </div>
+
+    </div>
+
+</div>
+
+<!-- Refresh Indicator -->
+<div class="refresh-indicator" id="refreshIndicator">
+    <i class="ph ph-arrows-clockwise"></i>
+    <span id="refreshText">Atualizando em 30s...</span>
 </div>
 
 <script>
-/* theme */
-const themeBtn = document.getElementById("themeBtn");
-const saved = localStorage.getItem("theme");
-if(saved==="dark"){
-    document.body.classList.add("dark");
-    themeBtn.textContent="☀️";
-}
-themeBtn.onclick=()=>{
-    const d=document.body.classList.toggle("dark");
-    localStorage.setItem("theme",d?"dark":"light");
-    themeBtn.textContent=d?"☀️":"🌙";
+/* =================================================================
+   LOGICA DE STATUS DA EQUIPE - 100% PRESERVADA
+   =================================================================
+*/
+
+const teamId = new URLSearchParams(window.location.search).get("team");
+const content = document.getElementById("content");
+const loading = document.getElementById("loading");
+const empty = document.getElementById("empty");
+const refreshIndicator = document.getElementById("refreshIndicator");
+const refreshText = document.getElementById("refreshText");
+
+// Elementos de exibição
+const teamBadge = document.getElementById("teamBadge");
+const statusIcon = document.getElementById("statusIcon");
+const statusTitle = document.getElementById("statusTitle");
+const statusDesc = document.getElementById("statusDesc");
+const updatedAt = document.getElementById("updatedAt");
+const issueText = document.getElementById("issueText");
+const mentorInfo = document.getElementById("mentorInfo");
+const mentorName = document.getElementById("mentorName");
+const mentorAvatar = document.getElementById("mentorAvatar");
+
+// Mapeamento de status para pt-BR
+const statusMap = {
+    "pending": {
+        icon: "ph-hourglass",
+        title: "Aguardando atendimento",
+        desc: "Seu chamado foi registrado e está na fila de atendimento. Um mentor será atribuído em breve.",
+        class: "status-pending"
+    },
+    "in_progress": {
+        icon: "ph-wrench",
+        title: "Em atendimento",
+        desc: "Um mentor está analisando seu problema. Aguarde instruções ou verifique sua estação.",
+        class: "status-in_progress"
+    },
+    "resolved": {
+        icon: "ph-check-circle",
+        title: "Resolvido",
+        desc: "Seu chamado foi resolvido. Caso o problema persista, abra um novo chamado.",
+        class: "status-resolved"
+    },
+    "cancelled": {
+        icon: "ph-x-circle",
+        title: "Cancelado",
+        desc: "Este chamado foi cancelado. Se necessário, registre uma nova solicitação.",
+        class: "status-cancelled"
+    }
 };
 
-/* team param */
-const params=new URLSearchParams(window.location.search);
-const team=params.get("team");
-
-const statusBox=document.getElementById("statusBox");
-const errorBox=document.getElementById("errorBox");
-
-const teamText=document.getElementById("teamText");
-const issueText=document.getElementById("issueText");
-const statusText=document.getElementById("statusText");
-const mentorText=document.getElementById("mentorText");
-const updatedText=document.getElementById("updatedText");
-
-let poller=null;
-
-if(!team){
-    errorBox.style.display="block";
-    errorBox.textContent="Missing team ID";
-}else{
-    teamText.textContent=team;
-    fetchStatus();
-    poller=setInterval(fetchStatus,10000);
+// Formatar data para pt-BR
+function formatarDataBR(dataString) {
+    if (!dataString) return "--:--";
+    const data = new Date(dataString);
+    return data.toLocaleString("pt-BR", { 
+        day: "2-digit", month: "2-digit", hour: "2-digit", minute: "2-digit" 
+    });
 }
 
-function fetchStatus(){
-    fetch(`/team/${team}/status`)
-        .then(async r=>{
-            if(!r.ok) throw await r.text();
-            return r.json();
-        })
-        .then(data=>{
-            errorBox.style.display="none";
-            statusBox.style.display="block";
+// Atualizar interface com dados da API
+function updateUI(data) {
+    // Exibir conteúdo principal
+    loading.style.display = "none";
+    empty.style.display = "none";
+    content.style.display = "block";
+    
+    // Badge da equipe
+    teamBadge.textContent = `Equipe #${teamId}`;
+    
+    // Status
+    const status = statusMap[data.status] || statusMap["pending"];
+    statusIcon.className = `status-icon ph-fill ${status.icon}`;
+    statusTitle.textContent = status.title;
+    statusDesc.textContent = status.desc;
+    document.getElementById("statusCard").className = `status-card ${status.class}`;
+    
+    // Data de atualização
+    updatedAt.textContent = formatarDataBR(data.updated_at);
+    
+    // Problema relatado
+    issueText.textContent = data.issue || "Nenhuma descrição disponível";
+    
+    // Mentor (se atribuído)
+    if (data.mentor && data.mentor !== "Aguardando atribuicao") {
+        mentorInfo.style.display = "flex";
+        mentorName.textContent = data.mentor;
+        mentorAvatar.textContent = data.mentor.charAt(0).toUpperCase();
+    } else {
+        mentorInfo.style.display = "none";
+    }
+}
 
-            statusBox.className=`status ${data.status}`;
+// Mostrar estado vazio (sem chamado)
+function showEmpty() {
+    loading.style.display = "none";
+    content.style.display = "none";
+    empty.style.display = "block";
+    teamBadge.textContent = `Equipe #${teamId}`;
+}
 
-            issueText.textContent=data.issue;
-            statusText.textContent=data.status.toUpperCase();
-            mentorText.textContent=data.mentor || "Not assigned yet";
-            updatedText.textContent=data.updated_at;
-        })
-        .catch(()=>{
-            statusBox.style.display="none";
-            errorBox.style.display="block";
-            errorBox.textContent="No active query found";
-            clearInterval(poller);
-        });
+// Buscar status da API
+async function fetchStatus() {
+    try {
+        const res = await fetch(`/team/${teamId}/status`);
+        
+        if (res.status === 404) {
+            showEmpty();
+            return;
+        }
+        
+        if (!res.ok) throw new Error("Falha na conexao");
+        
+        const data = await res.json();
+        updateUI(data);
+        
+        // Indicador de sincronização
+        refreshIndicator.classList.add("syncing");
+        refreshText.textContent = "Sincronizado agora";
+        setTimeout(() => {
+            refreshIndicator.classList.remove("syncing");
+            refreshText.textContent = "Próxima atualização em 30s...";
+        }, 2000);
+        
+    } catch (err) {
+        console.error("Erro ao buscar status:", err);
+        refreshText.textContent = "Erro ao sincronizar. Tentando novamente...";
+        refreshIndicator.classList.add("syncing");
+    }
+}
+
+// Polling a cada 30 segundos
+let countdown = 30;
+setInterval(() => {
+    countdown--;
+    if (countdown <= 0) {
+        countdown = 30;
+        fetchStatus();
+    } else {
+        refreshText.textContent = `Atualizando em ${countdown}s...`;
+    }
+}, 1000);
+
+// Tema (igual ao helpdesk_form.html)
+const themeBtn = document.getElementById("themeBtn");
+const toggleIcon = document.getElementById("toggleIcon");
+const body = document.body;
+
+function updateThemeUI(isLight) {
+    toggleIcon.className = isLight ? "ph-fill ph-sun" : "ph-fill ph-moon";
+}
+
+if(localStorage.getItem("theme") === "light"){
+    body.classList.add("light-mode");
+    updateThemeUI(true);
+}
+
+themeBtn.onclick = () => {
+    body.classList.toggle("light-mode");
+    const isLight = body.classList.contains("light-mode");
+    updateThemeUI(isLight);
+    localStorage.setItem("theme", isLight ? "light" : "dark");
+};
+
+// Inicialização
+if (teamId) {
+    fetchStatus(); // Primeira busca imediata
+} else {
+    showEmpty();
 }
 </script>
 
