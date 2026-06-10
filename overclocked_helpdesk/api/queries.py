@@ -7,15 +7,16 @@ from overclocked_helpdesk.models.query import Query
 from overclocked_helpdesk.models.mentor import Mentor
 from overclocked_helpdesk.services.email_service import send_email_alert
 
-router = APIRouter(prefix="/queries", tags=["queries"])
+# Mantem prefixo original para compatibilidade com o frontend JavaScript
+router = APIRouter(prefix="/queries", tags=["Chamados"])
 
 
 # -------------------------------------------------
-# Get all pending queries (unassigned)
+# Obter todos os chamados pendentes (nao atribuidos)
 # -------------------------------------------------
 @router.get("/pending")
 def get_pending_queries(db: Session = Depends(get_db)):
-    queries = (
+    chamados = (
         db.query(Query)
         .filter(
             Query.status == "PENDING",
@@ -32,19 +33,19 @@ def get_pending_queries(db: Session = Depends(get_db)):
             "issue": q.issue,
             "created_at": q.created_at.strftime("%H:%M"),
         }
-        for q in queries
+        for q in chamados
     ]
 
 
 # -------------------------------------------------
-# Get queries visible to a mentor
+# Obter chamados visiveis para um mentor especifico
 # -------------------------------------------------
 @router.get("/mentor/{mentor_id}")
 def get_active_queries_for_mentor(
     mentor_id: int,
     db: Session = Depends(get_db)
 ):
-    queries = (
+    chamados = (
         db.query(Query)
         .filter(
             or_(
@@ -70,12 +71,12 @@ def get_active_queries_for_mentor(
             "status": q.status,
             "created_at": q.created_at.strftime("%H:%M"),
         }
-        for q in queries
+        for q in chamados
     ]
 
 
 # -------------------------------------------------
-# Mentor accepts a query
+# Mentor aceita um chamado
 # -------------------------------------------------
 @router.patch("/{query_id}/accept/{mentor_id}")
 def accept_query(
@@ -83,24 +84,24 @@ def accept_query(
     mentor_id: int,
     db: Session = Depends(get_db)
 ):
-    query = db.query(Query).filter(Query.id == query_id).first()
+    chamado = db.query(Query).filter(Query.id == query_id).first()
     mentor = db.query(Mentor).filter(Mentor.id == mentor_id).first()
 
-    if not query:
-        raise HTTPException(status_code=404, detail="Query not found")
+    if not chamado:
+        raise HTTPException(status_code=404, detail="Chamado nao encontrado")
 
     if not mentor:
-        raise HTTPException(status_code=404, detail="Mentor not found")
+        raise HTTPException(status_code=404, detail="Mentor nao encontrado")
 
-    if query.status != "PENDING" or query.mentor_id is not None:
-        raise HTTPException(status_code=400, detail="Query already taken")
+    if chamado.status != "PENDING" or chamado.mentor_id is not None:
+        raise HTTPException(status_code=400, detail="Chamado ja atribuido a outro mentor")
 
     if not mentor.is_active:
-        raise HTTPException(status_code=400, detail="Mentor not available")
+        raise HTTPException(status_code=400, detail="Mentor nao disponivel no momento")
 
-    # assign query
-    query.mentor_id = mentor.id
-    query.status = "ASSIGNED"
+    # Atribuir chamado ao mentor
+    chamado.mentor_id = mentor.id
+    chamado.status = "ASSIGNED"
 
     mentor.current_load += 1
     if mentor.current_load >= mentor.max_load:
@@ -108,11 +109,11 @@ def accept_query(
 
     db.commit()
 
-    # -------- EMAIL (TEXT + HTML) --------
+    # -------- EMAIL (TEXTO + HTML) --------
     text_body = (
-        "You have accepted a helpdesk query.\n\n"
-        f"Team: {query.team_id}\n"
-        f"Issue: {query.issue}\n"
+        "Voce aceitou um chamado de suporte tecnico.\n\n"
+        f"Equipe: {chamado.team_id}\n"
+        f"Problema: {chamado.issue}\n"
     )
 
     html_body = f"""
@@ -124,7 +125,6 @@ def accept_query(
   <meta name="color-scheme" content="dark">
   <meta name="supported-color-schemes" content="dark">
   <style>
-    /* Force Dark Mode defaults */
     :root {{
       color-scheme: dark;
       supported-color-schemes: dark;
@@ -152,7 +152,7 @@ def accept_query(
                   </td>
                   <td align="right">
                     <span style="background:rgba(99,102,241,0.1); border:1px solid rgba(99,102,241,0.2); color:#818cf8; font-family:'Courier New', monospace; font-size:10px; font-weight:700; padding:4px 8px; border-radius:6px; letter-spacing:0.5px;">
-                      TICKET CONFIRMED
+                      CHAMADO CONFIRMADO
                     </span>
                   </td>
                 </tr>
@@ -164,10 +164,10 @@ def accept_query(
             <td style="padding: 32px;">
               
               <h1 style="margin:0 0 12px 0; font-size:22px; font-weight:700; color:#ededed;">
-                Query Assigned Successfully!
+                Chamado Atribuido com Sucesso!
               </h1>
               <p style="margin:0 0 24px 0; font-size:14px; color:#a1a1aa; line-height:1.6;">
-                You have successfully accepted a new helpdesk query. Please proceed to the location below to assist the team.
+                Voce aceitou um novo chamado de suporte. Dirija-se ao local informado abaixo para atender a equipe.
               </p>
 
               <table width="100%" border="0" cellspacing="0" cellpadding="0" style="background-color:#18181b; border:1px solid #27272a; border-radius:12px;">
@@ -178,18 +178,18 @@ def accept_query(
                       <tr>
                         <td width="50%" valign="top" style="padding-right:10px;">
                           <div style="font-family:'Courier New', monospace; font-size:10px; color:#6366f1; font-weight:700; text-transform:uppercase; margin-bottom:6px;">
-                            TARGET TEAM
+                            EQUIPE DESTINO
                           </div>
                           <div style="font-size:16px; font-weight:600; color:#ededed;">
-                            {query.team_id}
+                            {chamado.team_id}
                           </div>
                         </td>
                         <td width="50%" valign="top" style="border-left:1px solid #27272a; padding-left:20px;">
                           <div style="font-family:'Courier New', monospace; font-size:10px; color:#6366f1; font-weight:700; text-transform:uppercase; margin-bottom:6px;">
-                            LOCATION
+                            LOCALIZACAO
                           </div>
                           <div style="font-size:16px; font-weight:600; color:#ededed;">
-                            {query.location}
+                            {chamado.location}
                           </div>
                         </td>
                       </tr>
@@ -200,10 +200,10 @@ def accept_query(
                 <tr>
                   <td style="padding:20px;">
                     <div style="font-family:'Courier New', monospace; font-size:10px; color:#ef4444; font-weight:700; text-transform:uppercase; margin-bottom:8px;">
-                      REPORTED ISSUE
+                      PROBLEMA RELATADO
                     </div>
                     <div style="font-size:14px; line-height:1.5; color:#e4e4e7;">
-                      {query.issue}
+                      {chamado.issue}
                     </div>
                   </td>
                 </tr>
@@ -215,7 +215,7 @@ def accept_query(
           <tr>
             <td align="center" style="padding:20px; border-top:1px solid #27272a; background-color:#0a0a0c;">
               <p style="margin:0; font-family:'Courier New', monospace; font-size:10px; color:#52525b; letter-spacing:1px; text-transform:uppercase;">
-                Automated System Notification
+                Notificacao Automatica do Sistema
               </p>
             </td>
           </tr>
@@ -231,40 +231,40 @@ def accept_query(
 
     send_email_alert(
         to_email=mentor.email,
-        subject="OverClocked Helpdesk - Query Assigned",
+        subject="OverClocked Helpdesk - Chamado Atribuido",
         body=text_body,
         html=html_body
     )
 
     return {
         "ok": True,
-        "query_id": query.id,
+        "query_id": chamado.id,
         "mentor_id": mentor.id,
         "current_load": mentor.current_load
     }
 
 
 # -------------------------------------------------
-# Resolve a query
+# Resolver um chamado
 # -------------------------------------------------
 @router.patch("/{query_id}/resolve")
 def resolve_query(
     query_id: int,
     db: Session = Depends(get_db)
 ):
-    query = db.query(Query).filter(Query.id == query_id).first()
+    chamado = db.query(Query).filter(Query.id == query_id).first()
 
-    if not query:
-        raise HTTPException(status_code=404, detail="Query not found")
+    if not chamado:
+        raise HTTPException(status_code=404, detail="Chamado nao encontrado")
 
-    if query.status == "RESOLVED":
+    if chamado.status == "RESOLVED":
         return {"ok": True}
 
     mentor = None
-    if query.mentor_id:
-        mentor = db.query(Mentor).filter(Mentor.id == query.mentor_id).first()
+    if chamado.mentor_id:
+        mentor = db.query(Mentor).filter(Mentor.id == chamado.mentor_id).first()
 
-    query.status = "RESOLVED"
+    chamado.status = "RESOLVED"
 
     if mentor and mentor.current_load > 0:
         mentor.current_load -= 1
@@ -273,27 +273,27 @@ def resolve_query(
 
     db.commit()
 
-    return {"ok": True, "query_id": query.id}
+    return {"ok": True, "query_id": chamado.id}
 
 
 # -------------------------------------------------
-# Get single query
+# Obter um chamado especifico
 # -------------------------------------------------
 @router.get("/{query_id}")
 def get_query(
     query_id: int,
     db: Session = Depends(get_db)
 ):
-    query = db.query(Query).filter(Query.id == query_id).first()
+    chamado = db.query(Query).filter(Query.id == query_id).first()
 
-    if not query:
-        raise HTTPException(status_code=404, detail="Query not found")
+    if not chamado:
+        raise HTTPException(status_code=404, detail="Chamado nao encontrado")
 
     return {
-        "id": query.id,
-        "team_id": query.team_id,
-        "mentor_id": query.mentor_id,
-        "issue": query.issue,
-        "status": query.status,
-        "created_at": query.created_at.isoformat(),
+        "id": chamado.id,
+        "team_id": chamado.team_id,
+        "mentor_id": chamado.mentor_id,
+        "issue": chamado.issue,
+        "status": chamado.status,
+        "created_at": chamado.created_at.isoformat(),
     }
