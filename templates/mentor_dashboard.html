@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mentors Override</title>
+<title>Painel de Mentores - OverClocked CPFANI</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -297,17 +297,17 @@ body.light-mode .brand h1 { background: linear-gradient(to right, #000, #999); -
     
     <header>
         <div class="brand">
-            <h1>MENTOR_OPS</h1>
-            <div style="font-family: var(--font-code); color: var(--text-muted); font-size: 0.8rem; margin-top: 8px;">// SYSTEM STATUS: MONITORING</div>
+            <h1>PAINEL_MENTORES</h1>
+            <div style="font-family: var(--font-code); color: var(--text-muted); font-size: 0.8rem; margin-top: 8px;">// STATUS DO SISTEMA: MONITORANDO</div>
         </div>
 
         <div class="controls">
             <div class="pill-group">
-                <button class="filter-btn active" onclick="setFilter('all', this)">ALL</button>
-                <button class="filter-btn" onclick="setFilter('available', this)">ACTIVE</button>
-                <button class="filter-btn" onclick="setFilter('unavailable', this)">INACTIVE</button>
+                <button class="filter-btn active" onclick="setFilter('all', this)">TODOS</button>
+                <button class="filter-btn" onclick="setFilter('available', this)">ATIVOS</button>
+                <button class="filter-btn" onclick="setFilter('unavailable', this)">INATIVOS</button>
             </div>
-            <input class="search-input" id="search" placeholder="Search ID..." oninput="filterCards()">
+            <input class="search-input" id="search" placeholder="Buscar ID..." oninput="filterCards()">
             <button class="theme-toggle" id="themeIcon" onclick="toggleTheme()">☀</button>
         </div>
     </header>
@@ -336,7 +336,7 @@ body.light-mode .brand h1 { background: linear-gradient(to right, #000, #999); -
 
         <div class="stats">
             <div class="stat-row">
-                <span>WORKLOAD</span>
+                <span>CARGA DE TRABALHO</span>
                 <span id="load-{{ mentor.id }}">{{ mentor.current_load }} / {{ mentor.max_load }}</span>
             </div>
             <div class="bar-bg">
@@ -348,14 +348,14 @@ body.light-mode .brand h1 { background: linear-gradient(to right, #000, #999); -
 
         <div class="tickets">
             <ul id="queries-{{ mentor.id }}" data-mentor="{{ mentor.id }}">
-                <li style="color:var(--text-muted); font-style:italic; font-size:0.8rem;">Syncing...</li>
+                <li style="color:var(--text-muted); font-style:italic; font-size:0.8rem;">Sincronizando...</li>
             </ul>
         </div>
 
         <button class="action-btn {{ 'btn-offline' if mentor.is_active else 'btn-online' }}"
                 id="btn-{{ mentor.id }}"
                 onclick="toggleAvailability({{ mentor.id }})">
-            {{ 'GO OFFLINE' if mentor.is_active else 'GO ONLINE' }}
+            {{ 'FICAR OFFLINE' if mentor.is_active else 'FICAR ONLINE' }}
         </button>
 
     </div>
@@ -367,7 +367,7 @@ body.light-mode .brand h1 { background: linear-gradient(to right, #000, #999); -
 <script>
 let currentFilter = 'all';
 
-// --- Logic from previous version, adapted for new classes ---
+// --- Logica da versao anterior, adaptada para novas classes ---
 
 function toggleTheme(){
     const b = document.body;
@@ -407,24 +407,24 @@ function updateCardUI(id, isActive) {
     const btn = document.getElementById(`btn-${id}`);
     const statusText = document.getElementById(`status-text-${id}`);
 
-    // Update Data
+    // Atualizar Dados
     card.dataset.active = isActive ? "true" : "false";
 
-    // Visual State (Offline = Recede/Gray)
+    // Estado Visual (Offline = Recuar/Cinza)
     if(isActive) {
         card.classList.remove("unavailable");
         statusText.textContent = "ONLINE";
         
         btn.classList.remove('btn-online');
         btn.classList.add('btn-offline');
-        btn.textContent = "GO OFFLINE";
+        btn.textContent = "FICAR OFFLINE";
     } else {
         card.classList.add("unavailable");
         statusText.textContent = "OFFLINE";
         
         btn.classList.remove('btn-offline');
         btn.classList.add('btn-online');
-        btn.textContent = "GO ONLINE";
+        btn.textContent = "FICAR ONLINE";
     }
     
     filterCards();
@@ -438,17 +438,17 @@ function toggleAvailability(id) {
     const isCurrentlyActive = card.dataset.active === "true";
     
     btn.classList.add("loading");
-    btn.textContent = "PROCESSING...";
+    btn.textContent = "PROCESSANDO...";
     
-    // Optimistic Update
+    // Atualizacao Otimista
     updateCardUI(id, !isCurrentlyActive);
 
     fetch(`/mentors/${id}/toggle-availability`, { method: "PATCH" })
         .then(r => { if(!r.ok) throw 0; return r.json(); })
         .then(() => refreshMentors())
         .catch(() => {
-            updateCardUI(id, isCurrentlyActive); // Revert
-            alert("System Error: Could not sync status.");
+            updateCardUI(id, isCurrentlyActive); // Reverter
+            alert("Erro do sistema: Não foi possível sincronizar o status.");
         })
         .finally(() => {
             btn.classList.remove("loading");
@@ -478,7 +478,7 @@ function loadQueries(id) {
             ul.innerHTML = "";
 
             if (!list.length) {
-                ul.innerHTML = `<li style="color:var(--text-muted); font-size:0.8rem; padding:10px;">No active tickets</li>`;
+                ul.innerHTML = `<li style="color:var(--text-muted); font-size:0.8rem; padding:10px;">Nenhum chamado ativo</li>`;
                 return;
             }
 
@@ -491,7 +491,7 @@ function loadQueries(id) {
             <span class="t-id">#${q.team_id}</span>
             ${q.issue}
         </div>
-        <button class="btn-done" onclick="acceptQuery(${q.id}, ${id})">ACCEPT</button>
+        <button class="btn-done" onclick="acceptQuery(${q.id}, ${id})">ACEITAR</button>
     `;
 } else {
     li.innerHTML = `
@@ -499,7 +499,7 @@ function loadQueries(id) {
             <span class="t-id">#${q.team_id}</span>
             ${q.issue}
         </div>
-        <button class="btn-done" onclick="resolveQuery(${q.id})">RESOLVE</button>
+        <button class="btn-done" onclick="resolveQuery(${q.id})">RESOLVER</button>
     `;
 }
 
@@ -523,7 +523,7 @@ function acceptQuery(queryId, mentorId) {
         return r.json();
     })
     .then(() => refreshMentors())
-    .catch(() => alert("Could not accept query"));
+    .catch(() => alert("Não foi possível aceitar o chamado"));
 }
 
 </script>
