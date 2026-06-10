@@ -5,7 +5,7 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from sqlalchemy import desc
 from datetime import datetime
-from overclocked_helpdesk.config import settings, TIMEZONE, DATETIME_FORMAT
+from overclocked_helpdesk.config import settings
 
 from overclocked_helpdesk.db.session import SessionLocal, engine, Base, get_db
 from overclocked_helpdesk.services.notifier import notify_and_create_query
@@ -61,7 +61,7 @@ def formatar_data_br(data: datetime) -> str:
     """Formata datetime para padrao brasileiro DD/MM/AAAA HH:MM:SS."""
     if data is None:
         return ""
-    return data.astimezone(TIMEZONE).strftime(DATETIME_FORMAT)
+    return data.astimezone(settings.TIMEZONE).strftime(settings.DATETIME_FORMAT)
 
 
 def background_notify(team_id: int, issue: str, location: str):

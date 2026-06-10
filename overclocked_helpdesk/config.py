@@ -2,54 +2,6 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from datetime import timezone, timedelta
 
 
-# =============================================================================
-# CONFIGURACOES GERAIS DO PROJETO - OVERCLOCKED CPFANI
-# Todas as mensagens e configuracoes em portugues do Brasil (pt-BR)
-# =============================================================================
-
-# Idioma e regionalizacao
-LANG: str = "pt-BR"
-TIMEZONE: timezone = timezone(timedelta(hours=-3), name="America/Sao_Paulo")
-DATE_FORMAT: str = "%d/%m/%Y"
-DATETIME_FORMAT: str = "%d/%m/%Y %H:%M:%S"
-CURRENCY_LOCALE: str = "pt_BR"
-
-# Mensagens de sistema padronizadas em pt-BR
-MESSAGES = {
-    "sucesso_operacao": "Operacao realizada com sucesso.",
-    "erro_servidor": "Ocorreu um erro interno no servidor. Tente novamente mais tarde.",
-    "erro_validacao": "Dados invalidos. Verifique os campos e tente novamente.",
-    "erro_autenticacao": "Falha na autenticacao. Credenciais invalidas ou expiradas.",
-    "erro_permissao": "Acesso negado. Voce nao tem permissao para realizar esta acao.",
-    "erro_recurso_nao_encontrado": "Recurso nao encontrado. Verifique o identificador informado.",
-    "erro_banco_dados": "Erro ao acessar o banco de dados. Contate o administrador.",
-    "erro_email_envio": "Falha ao enviar e-mail. Verifique as configuracoes SMTP.",
-    "erro_slack_envio": "Falha ao enviar notificacao para o Slack.",
-    "aviso_manutencao": "Sistema em manutencao programada. Retorne em breve.",
-}
-
-# Mensagens de validacao de campos em pt-BR
-VALIDATION_MESSAGES = {
-    "campo_obrigatorio": "Este campo e obrigatorio.",
-    "email_invalido": "Formato de e-mail invalido.",
-    "telefone_invalido": "Formato de telefone invalido. Use (XX) XXXXX-XXXX.",
-    "cpf_invalido": "CPF invalido. Verifique os digitos informados.",
-    "senha_curta": "A senha deve ter no minimo 8 caracteres.",
-    "senha_sem_requisitos": "A senha deve conter letras e numeros.",
-    "data_invalida": "Formato de data invalido. Use DD/MM/AAAA.",
-    "valor_negativo": "O valor nao pode ser negativo.",
-    "arquivo_grande": "O arquivo excede o tamanho maximo permitido.",
-    "tipo_arquivo_invalido": "Tipo de arquivo nao permitido.",
-}
-
-# Configuracoes de upload e arquivos
-UPLOAD_CONFIG = {
-    "max_size_mb": 10,
-    "allowed_extensions": [".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png", ".txt"],
-    "upload_folder": "uploads",
-}
-
-
 class Settings(BaseSettings):
     """
     Configuracoes centrais do projeto OverClocked CPFANI.
@@ -58,20 +10,70 @@ class Settings(BaseSettings):
     """
 
     # ========================================================================
+    # IDIOMA E REGIONALIZACAO
+    # ========================================================================
+    LANG: str = "pt-BR"
+    TIMEZONE: timezone = timezone(timedelta(hours=-3), name="America/Sao_Paulo")
+    DATE_FORMAT: str = "%d/%m/%Y"
+    DATETIME_FORMAT: str = "%d/%m/%Y %H:%M:%S"
+    CURRENCY_LOCALE: str = "pt_BR"
+
+    # ========================================================================
+    # MENSAGENS DE SISTEMA (pt-BR)
+    # ========================================================================
+    MESSAGES: dict = {
+        "sucesso_operacao": "Operacao realizada com sucesso.",
+        "erro_servidor": "Ocorreu um erro interno no servidor. Tente novamente mais tarde.",
+        "erro_validacao": "Dados invalidos. Verifique os campos e tente novamente.",
+        "erro_autenticacao": "Falha na autenticacao. Credenciais invalidas ou expiradas.",
+        "erro_permissao": "Acesso negado. Voce nao tem permissao para realizar esta acao.",
+        "erro_recurso_nao_encontrado": "Recurso nao encontrado. Verifique o identificador informado.",
+        "erro_banco_dados": "Erro ao acessar o banco de dados. Contate o administrador.",
+        "erro_email_envio": "Falha ao enviar e-mail. Verifique as configuracoes SMTP.",
+        "erro_slack_envio": "Falha ao enviar notificacao para o Slack.",
+        "aviso_manutencao": "Sistema em manutencao programada. Retorne em breve.",
+    }
+
+    # ========================================================================
+    # MENSAGENS DE VALIDACAO (pt-BR)
+    # ========================================================================
+    VALIDATION_MESSAGES: dict = {
+        "campo_obrigatorio": "Este campo e obrigatorio.",
+        "email_invalido": "Formato de e-mail invalido.",
+        "telefone_invalido": "Formato de telefone invalido. Use (XX) XXXXX-XXXX.",
+        "cpf_invalido": "CPF invalido. Verifique os digitos informados.",
+        "senha_curta": "A senha deve ter no minimo 8 caracteres.",
+        "senha_sem_requisitos": "A senha deve conter letras e numeros.",
+        "data_invalida": "Formato de data invalido. Use DD/MM/AAAA.",
+        "valor_negativo": "O valor nao pode ser negativo.",
+        "arquivo_grande": "O arquivo excede o tamanho maximo permitido.",
+        "tipo_arquivo_invalido": "Tipo de arquivo nao permitido.",
+    }
+
+    # ========================================================================
+    # CONFIGURACOES DE UPLOAD
+    # ========================================================================
+    UPLOAD_CONFIG: dict = {
+        "max_size_mb": 10,
+        "allowed_extensions": [".pdf", ".doc", ".docx", ".jpg", ".jpeg", ".png", ".txt"],
+        "upload_folder": "uploads",
+    }
+
+    # ========================================================================
     # BANCO DE DADOS
     # ========================================================================
     DATABASE_URL: str = "sqlite:///./helpdesk.db"
-    DATABASE_ECHO: bool = False  # Log de queries SQL (desativado em producao)
+    DATABASE_ECHO: bool = False
 
     # ========================================================================
-    # SLACK - INTEGRACAO DE NOTIFICACOES
+    # SLACK
     # ========================================================================
     SLACK_BOT_TOKEN: str | None = None
     SLACK_WEBHOOK_URL: str | None = None
     SLACK_CHANNEL_PADRAO: str = "#helpdesk-cpfani"
 
     # ========================================================================
-    # EMAIL - CONFIGURACOES SMTP
+    # EMAIL - SMTP
     # ========================================================================
     SMTP_SERVER: str = "smtp.gmail.com"
     SMTP_PORT: int = 465
@@ -84,14 +86,14 @@ class Settings(BaseSettings):
     # ========================================================================
     # SEGURANCA E SESSAO
     # ========================================================================
-    SECRET_KEY: str | None = None  # Definir via .env em producao
+    SECRET_KEY: str | None = None
     TOKEN_EXPIRACAO_MINUTOS: int = 60
     SENHA_MINIMA_TAMANHO: int = 8
 
     # ========================================================================
     # LOG E MONITORAMENTO
     # ========================================================================
-    LOG_NIVEL: str = "INFO"  # DEBUG, INFO, WARNING, ERROR, CRITICAL
+    LOG_NIVEL: str = "INFO"
     LOG_ARQUIVO: str = "logs/app.log"
     LOG_ROTACAO_DIAS: int = 7
 
@@ -101,21 +103,22 @@ class Settings(BaseSettings):
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
-        extra="ignore",  # Ignora variaveis nao definidas no modelo
-        case_sensitive=False
+        extra="ignore",
+        case_sensitive=False,
+        arbitrary_types_allowed=True  # Necessario para aceitar timezone como tipo
     )
 
     # ========================================================================
-    # PROPRIEDADES COMPUTADAS (leitura facil das configuracoes)
+    # PROPRIEDADES COMPUTADAS
     # ========================================================================
     @property
     def is_producao(self) -> bool:
-        """Retorna True se o ambiente for de producao (sem DEBUG)."""
+        """Retorna True se o ambiente for de producao."""
         return self.LOG_NIVEL.upper() not in ["DEBUG", "INFO"]
 
     @property
     def database_tipo(self) -> str:
-        """Retorna o tipo do banco de dados (sqlite, postgresql, mysql, etc.)."""
+        """Retorna o tipo do banco de dados."""
         if self.DATABASE_URL.startswith("sqlite"):
             return "sqlite"
         elif self.DATABASE_URL.startswith("postgresql"):
@@ -125,5 +128,5 @@ class Settings(BaseSettings):
         return "desconhecido"
 
 
-# Instancia global das configuracoes para importacao em todo o projeto
+# Instancia global das configuracoes
 settings = Settings()
