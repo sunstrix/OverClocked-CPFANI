@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<title>OverClocked Helpdesk</title>
+<title>OverClocked Helpdesk - CPFANI</title>
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -105,7 +105,7 @@ body {
     padding: 40px 30px;
     box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);
     position: relative;
-    overflow: visible; /* Important for dropdown */
+    overflow: visible;
     transform: translateY(0);
     transition: all 0.3s ease;
 }
@@ -140,11 +140,10 @@ body.light-mode .theme-switch { background: rgba(255,255,255,0.4); }
     align-items: center;
     justify-content: center;
     transition: transform 0.4s cubic-bezier(0.85, 0, 0.15, 1);
-    color: var(--bg-color); /* Icon color matches bg */
+    color: var(--bg-color);
     font-size: 14px;
 }
 
-/* Toggle Logic in CSS */
 body.light-mode .switch-knob { transform: translateX(28px); }
 
 /* --- HEADER --- */
@@ -192,7 +191,7 @@ input, textarea {
     background: var(--input-bg);
     border: 1px solid var(--glass-border);
     border-radius: 16px;
-    padding: 16px 16px 16px 48px; /* Room for icon */
+    padding: 16px 16px 16px 48px;
     color: var(--text-main);
     font-family: var(--font-body);
     font-size: 1rem;
@@ -210,20 +209,19 @@ textarea { min-height: 120px; resize: none; }
     transition: 0.3s;
 }
 
-/* Focus States */
 input:focus, textarea:focus {
-    background: rgba(var(--primary), 0.05); /* Slight tint */
+    background: rgba(var(--primary), 0.05);
     border-color: var(--primary);
     box-shadow: 0 0 20px var(--glow);
 }
 input:focus + .input-icon, textarea:focus + .input-icon { color: var(--primary); }
 
-/* --- IMPROVED GLASS DROPDOWN --- */
+/* --- DROPDOWN --- */
 .dropdown-menu {
     position: absolute;
     top: calc(100% + 10px);
     left: 0; right: 0;
-    background: var(--glass-surface); /* Glass effect */
+    background: var(--glass-surface);
     backdrop-filter: blur(30px);
     -webkit-backdrop-filter: blur(30px);
     border: 1px solid var(--glass-border);
@@ -234,8 +232,6 @@ input:focus + .input-icon, textarea:focus + .input-icon { color: var(--primary);
     z-index: 50;
     display: none;
     box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-    
-    /* Animation */
     animation: slideIn 0.2s cubic-bezier(0.18, 0.89, 0.32, 1.28);
 }
 
@@ -261,13 +257,12 @@ input:focus + .input-icon, textarea:focus + .input-icon { color: var(--primary);
 
 .dropdown-item:hover {
     background: rgba(255,255,255,0.1);
-    padding-left: 20px; /* Slide effect */
+    padding-left: 20px;
 }
 body.light-mode .dropdown-item:hover { background: rgba(0,0,0,0.05); }
 
 .dropdown-item:hover i { opacity: 1; transform: translateX(0); }
 
-/* Scrollbar styling */
 .dropdown-menu::-webkit-scrollbar { width: 6px; }
 .dropdown-menu::-webkit-scrollbar-thumb { background: var(--glass-border); border-radius: 99px; }
 
@@ -316,11 +311,9 @@ body.light-mode .dropdown-item:hover { background: rgba(0,0,0,0.05); }
 .msg.error { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.3); }
 @keyframes fadeIn { from{opacity:0; transform:translateY(10px)} to{opacity:1; transform:translateY(0)} }
 
-/* --- RESPONSIVE ADJUSTMENTS --- */
 @media (max-width: 480px) {
     .card { padding: 30px 20px; }
     .header h1 { font-size: 2rem; }
-    /* Make dropdown full width on mobile for better touch */
     .dropdown-menu { position: fixed; bottom: 0; left: 0; right: 0; top: auto; border-radius: 20px 20px 0 0; max-height: 40vh; border-bottom: none; }
 }
 </style>
@@ -343,37 +336,37 @@ body.light-mode .dropdown-item:hover { background: rgba(0,0,0,0.05); }
 
     <div class="header">
         <h1>OverClocked</h1>
-        <p>HELPDESK PORTAL</p>
+        <p>PORTAL DE SUPORTE</p>
     </div>
 
     <form id="form">
         <div class="form-group">
-            <label>Team Identity</label>
+            <label>Identidade da Equipe</label>
             <div class="input-box">
-                <input id="teamInput" name="team_id" placeholder="Select your team..." autocomplete="off" required>
+                <input id="teamInput" name="team_id" placeholder="Selecione sua equipe..." autocomplete="off" required>
                 <i class="ph ph-users input-icon"></i>
             </div>
             <div id="dropdown" class="dropdown-menu"></div>
         </div>
 
         <div class="form-group">
-            <label>Current Location</label>
+            <label>Localização Atual</label>
             <div class="input-box">
-                <input id="location" name="location" placeholder="e.g. Lab 4, Station 12" required>
+                <input id="location" name="location" placeholder="ex: Lab 4, Estação 12" required>
                 <i class="ph ph-map-pin input-icon"></i>
             </div>
         </div>
 
         <div class="form-group">
-            <label>Diagnostic Data</label>
+            <label>Dados do Problema</label>
             <div class="input-box">
-                <textarea id="issue" name="issue" placeholder="Describe the malfunction..." required></textarea>
+                <textarea id="issue" name="issue" placeholder="Descreva o problema..." required></textarea>
                 <i class="ph ph-warning-octagon input-icon"></i>
             </div>
         </div>
 
         <button class="submit-btn" id="btn">
-            INITIATE REQUEST
+            INICIAR SOLICITAÇÃO
         </button>
     </form>
 
@@ -382,44 +375,39 @@ body.light-mode .dropdown-item:hover { background: rgba(0,0,0,0.05); }
 
 <script>
 /* =================================================================
-   LOGIC SECTION - 100% PRESERVED
+   LOGICA DO SISTEMA - 100% PRESERVADA
    =================================================================
 */
 
-const teams = Array.from({length:40},(_,i)=>`Team ${i+1}`);
+const teams = Array.from({length:40},(_,i)=>`Equipe ${i+1}`);
 const teamInput = document.getElementById("teamInput");
 const dropdown = document.getElementById("dropdown");
 const msg = document.getElementById("msg");
 const btn = document.getElementById("btn");
 
-/* 1. QR Code Prefill Logic */
+/* 1. Logica de Preenchimento via QR Code */
 const params = new URLSearchParams(window.location.search);
 const qrTeam = params.get("team");
-if (qrTeam && teams.includes(`Team ${qrTeam}`)) {
-    teamInput.value = `Team ${qrTeam}`;
+if (qrTeam && teams.includes(`Equipe ${qrTeam}`)) {
+    teamInput.value = `Equipe ${qrTeam}`;
 }
 
-/* 2. Dropdown Logic */
+/* 2. Logica do Dropdown */
 function renderDropdown(){
     dropdown.innerHTML="";
     const v = teamInput.value.toLowerCase();
     const list = teams.filter(t=>t.toLowerCase().includes(v));
     
-    // Hide if no matches
     if(!list.length){
         dropdown.style.display="none";
         return;
     }
     
-    // Show Dropdown
     dropdown.style.display="block";
     list.forEach(t=>{
         const d=document.createElement("div");
         d.className="dropdown-item";
-        
-        // Added Icon for UI flair, logic remains same
         d.innerHTML=`<span>${t}</span><i class="ph-bold ph-caret-right"></i>`;
-        
         d.onclick=()=>{
             teamInput.value=t;
             dropdown.style.display="none";
@@ -428,35 +416,31 @@ function renderDropdown(){
     });
 }
 
-// Triggers
 teamInput.oninput = renderDropdown;
 teamInput.onfocus = renderDropdown;
 
-// Close dropdown if clicked outside
 document.addEventListener('click', (e) => {
     if (!teamInput.contains(e.target) && !dropdown.contains(e.target)) {
         dropdown.style.display = 'none';
     }
 });
 
-/* 3. Submit Logic */
+/* 3. Logica de Envio do Formulario */
 document.getElementById("form").onsubmit = async e=>{
     e.preventDefault();
 
     if(!teams.includes(teamInput.value.trim())){
         msg.className="msg error";
-        msg.textContent="Please select a valid team from the dropdown";
+        msg.textContent="Selecione uma equipe válida na lista";
         msg.style.display="block";
         return;
     }
 
-    // UI Feedback
     const originalText = btn.innerText;
     btn.disabled=true;
-    btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> TRANSMITTING...';
+    btn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> ENVIANDO...';
     msg.style.display="none";
 
-    // Data Prep
     const fd = new FormData(e.target);
     const teamNumber = Number(teamInput.value.split(" ")[1]);
     fd.set("team_id", teamNumber);
@@ -464,31 +448,28 @@ document.getElementById("form").onsubmit = async e=>{
     try {
         const res = await fetch("/submit",{ method:"POST", body:fd });
 
-        if(!res.ok) throw new Error("Failed");
+        if(!res.ok) throw new Error("Falha");
 
         const data = await res.json();
-        // Redirect
         window.location.href = `/team-status?team=${data.team_id}`;
     } catch(err) {
         msg.className="msg error";
-        msg.textContent="Transmission Error. Try again.";
+        msg.textContent="Erro de transmissão. Tente novamente.";
         msg.style.display="block";
         btn.disabled=false;
         btn.innerText = originalText;
     }
 };
 
-/* 4. Modern Theme Toggle Logic */
+/* 4. Logica de Alternancia de Tema */
 const themeBtn = document.getElementById("themeBtn");
 const toggleIcon = document.getElementById("toggleIcon");
 const body = document.body;
 
 function updateThemeUI(isLight) {
-    // If light mode, show Sun icon. If dark mode, show Moon.
     toggleIcon.className = isLight ? "ph-fill ph-sun" : "ph-fill ph-moon";
 }
 
-// Check local storage on load
 if(localStorage.getItem("theme") === "light"){
     body.classList.add("light-mode");
     updateThemeUI(true);
