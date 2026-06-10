@@ -92,9 +92,9 @@ def background_notify(team_id: int, issue: str, location: str):
 def show_helpdesk_form(request: Request):
     """Exibe o formulario principal para equipes registrarem novos chamados de suporte."""
     return templates.TemplateResponse(
-        "helpdesk_form.html",
-        {
-            "request": request,
+        request=request,
+        name="helpdesk_form.html",
+        context={
             "title": "Abrir Chamado - OverClocked CPFANI",
             "lang": settings.LANG
         }
@@ -142,9 +142,9 @@ def team_status_page(
 ):
     """Exibe a pagina de status para uma equipe especifica acompanhar seu chamado."""
     return templates.TemplateResponse(
-        "team_status.html",
-        {
-            "request": request,
+        request=request,
+        name="team_status.html",
+        context={
             "team_id": team,
             "title": f"Status da Equipe {team} - OverClocked CPFANI",
             "lang": settings.LANG
@@ -207,9 +207,9 @@ def mentors_dashboard(
     mentors = db.query(Mentor).all()
 
     return templates.TemplateResponse(
-        "mentor_dashboard.html",
-        {
-            "request": request,
+        request=request,
+        name="mentor_dashboard.html",
+        context={
             "mentors": mentors,
             "title": "Painel de Mentores - OverClocked CPFANI",
             "lang": settings.LANG
